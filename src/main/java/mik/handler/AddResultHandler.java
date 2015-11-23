@@ -1,7 +1,7 @@
 package mik.handler;
 
 import com.hazelcast.core.IMap;
-import com.hazelcast.query.Predicates;
+import com.hazelcast.core.MultiMap;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import mik.InMemoryData;
@@ -48,14 +48,14 @@ public class AddResultHandler implements HttpHandler {
 
     private void cheackAddNewResult(RequestAdd newRes) {
 
-        IMap<Integer, ResultTop> listOfUser = InMemoryData.getInstance().getMap("topOfUser");
-        IMap<Integer, ResultTop> listOfLevel = InMemoryData.getInstance().getMap("topOfLevel");
+        MultiMap<Integer, ResultTop> listOfUser = InMemoryData.getInstance().getMultiMap("topOfUser");
+        MultiMap<Integer, ResultTop> listOfLevel = InMemoryData.getInstance().getMultiMap("topOfLevel");
 
         //находим минимальный результат в каждом разрезе
-        Collection<ResultTop> listForUserResult = listOfUser.values(Predicates.equal("userId", newRes.getUserId()));
+        Collection<ResultTop> listForUserResult = listOfUser.get(newRes.getUserId());
         ResultTop minUser = getMinResult(listForUserResult);
 
-        Collection<ResultTop>listForLevelResult = listOfLevel.values(Predicates.equal("levelId", newRes.getLevelId()));
+        Collection<ResultTop>listForLevelResult = listOfLevel.get(newRes.getLevelId());
         ResultTop minLevel = getMinResult(listForLevelResult);
 
         //определяем будет ли входить новое значение в один из топ по разрезам
@@ -64,10 +64,10 @@ public class AddResultHandler implements HttpHandler {
                     + ", levelId = " + newRes.getLevelId() + ", result = " + newRes.getResult());
             listOfUser.put(newRes.getUserId(), new ResultTop(newRes.getLevelId(), newRes.getResult()));
 
-            if (listOfUser.size() > 20){
+            if (listForUserResult.size() > 20){
                 logger.debug("delete result from TOP users : userId = " + newRes.getUserId()
                         + ", levelId = " + minUser.getParamId() + ", result = " + minUser.getResult());
-                listOfUser.delete(minUser);
+                listForUserResult.remove(minUser);
             }
         }
 
@@ -76,10 +76,10 @@ public class AddResultHandler implements HttpHandler {
                     + ", levelId = " + newRes.getLevelId() + ", result = " + newRes.getResult());
             listOfLevel.put(newRes.getLevelId(), new ResultTop(newRes.getUserId(), newRes.getResult()));
 
-            if (listOfLevel.size() > 20){
+            if (listForLevelResult.size() > 20){
                 logger.debug("delete result from TOP levels : userId = " + minLevel.getParamId()
                         + ", levelId = " + newRes.getLevelId() + ", result = " + minLevel.getResult());
-                listOfLevel.delete(minLevel);
+                listForLevelResult.remove(minLevel);
             }
         }
     }
