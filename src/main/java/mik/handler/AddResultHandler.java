@@ -30,8 +30,6 @@ public class AddResultHandler implements HttpHandler {
         String request = convertStreamToString(httpExchange.getRequestBody());
         RequestAdd newRes = Utils.fromJSON(request, RequestAdd.class);
 
-        //IMap<Integer, Result> listResult = InMemoryData.getInstance().getMap("result");
-
         // проверка и добавление в справочник пользователей
         cheackAddUserToCatalog(newRes);
 
@@ -63,28 +61,24 @@ public class AddResultHandler implements HttpHandler {
         //определяем будет ли входить новое значение в один из топ по разрезам
         if(minUser == null || minUser.getResult() < newRes.getResult()) {
             logger.debug("add new result to TOP users : userId = " + newRes.getUserId()
-                    + ", levelId = " + newRes.getLevelId()
-                    + ", result = " + newRes.getResult());
+                    + ", levelId = " + newRes.getLevelId() + ", result = " + newRes.getResult());
             listOfUser.put(newRes.getUserId(), new ResultTop(newRes.getLevelId(), newRes.getResult()));
 
             if (listOfUser.size() > 20){
                 logger.debug("delete result from TOP users : userId = " + newRes.getUserId()
-                        + ", levelId = " + minUser.getParamId()
-                        + ", result = " + minUser.getResult());
+                        + ", levelId = " + minUser.getParamId() + ", result = " + minUser.getResult());
                 listOfUser.delete(minUser);
             }
         }
 
         if (minLevel == null || minLevel.getResult() < newRes.getResult()){
             logger.debug("add new result to TOP levels : userId = " + newRes.getUserId()
-                    + ", levelId = " + newRes.getLevelId()
-                    + ", result = " + newRes.getResult());
+                    + ", levelId = " + newRes.getLevelId() + ", result = " + newRes.getResult());
             listOfLevel.put(newRes.getLevelId(), new ResultTop(newRes.getUserId(), newRes.getResult()));
 
             if (listOfLevel.size() > 20){
                 logger.debug("delete result from TOP levels : userId = " + minLevel.getParamId()
-                        + ", levelId = " + newRes.getLevelId()
-                        + ", result = " + minLevel.getResult());
+                        + ", levelId = " + newRes.getLevelId() + ", result = " + minLevel.getResult());
                 listOfLevel.delete(minLevel);
             }
         }
@@ -116,7 +110,7 @@ public class AddResultHandler implements HttpHandler {
         return retMin;
     }
 
-    String convertStreamToString(java.io.InputStream is) {
+    private String convertStreamToString(java.io.InputStream is) {
         Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
         return s.hasNext() ? s.next() : "";
     }
