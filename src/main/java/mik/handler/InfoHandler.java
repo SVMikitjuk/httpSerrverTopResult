@@ -34,7 +34,7 @@ public abstract class InfoHandler implements HttpHandler {
         PrintWriter out = new PrintWriter(httpExchange.getResponseBody());
         out.println(getTitle());
         for(ResultTop item : results)
-            out.println(item.getParamId() + "=" + item.getResult());
+            out.println(getParam() + " " + item.getParamId() + " = " + item.getResult());
 
         out.close();
         httpExchange.close();

@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.concurrent.Executors;
 
 /**
  * Created by mikitjuk on 18.11.15.
@@ -26,6 +27,8 @@ public class HttpServerEx {
             server.createContext("/userinfo", new UserTopHandler());
             server.createContext("/levelinfo", new LevelTopHandler());
             server.createContext("/setinfo", new AddResultHandler());
+            // Set an Executor for the multi-threading
+            server.setExecutor(Executors.newCachedThreadPool());
             server.start();
 
             logger.debug("Server started\t Press any key to stop...");

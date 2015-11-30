@@ -29,16 +29,16 @@ public class AddResultHandler implements HttpHandler {
 
         String request = convertStreamToString(httpExchange.getRequestBody());
         RequestAdd newRes = Utils.fromJSON(request, RequestAdd.class);
+        synchronized(newRes) {
+            // проверка и добавление в справочник пользователей
+            cheackAddUserToCatalog(newRes);
 
-        // проверка и добавление в справочник пользователей
-        cheackAddUserToCatalog(newRes);
+            // проверка и добавление в справочник уровней
+            cheackAddLevelToCatalog(newRes);
 
-        // проверка и добавление в справочник уровней
-        cheackAddLevelToCatalog(newRes);
-
-        // определенеи на добавление в нового результата
-        cheackAddNewResult(newRes);
-
+            // определенеи на добавление в нового результата
+            cheackAddNewResult(newRes);
+        }
         httpExchange.sendResponseHeaders(200, 0);
         PrintWriter out = new PrintWriter(httpExchange.getResponseBody());
         out.println("Result added!" );
