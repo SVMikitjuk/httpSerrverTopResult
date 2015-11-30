@@ -1,12 +1,9 @@
 package test;
 
 import com.sun.net.httpserver.HttpServer;
-import jdk.nashorn.internal.ir.annotations.Ignore;
-import junit.framework.TestCase;
 import mik.handler.AddResultHandler;
 import mik.handler.LevelTopHandler;
 import mik.handler.UserTopHandler;
-import org.apache.log4j.Logger;
 import org.junit.*;
 
 import java.io.*;
@@ -14,9 +11,8 @@ import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.concurrent.Executors;
 
-@Ignore
+
 public class AppTest {
 
     private static HttpServer server = null;
