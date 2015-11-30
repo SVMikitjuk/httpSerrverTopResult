@@ -9,7 +9,6 @@ import org.junit.*;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 
@@ -48,8 +47,10 @@ public class AppTest {
             OutputStream os = connection.getOutputStream();
             os.write("{\"user_id\":\"1\",\"level_id\":\"1\",\"result\":\"1\"}".getBytes());
             connection.connect();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
+
+            InputStream stream = connection.getInputStream();
+            stream.close();
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -70,20 +71,10 @@ public class AppTest {
             os.write("{\"user_id\":\"2\",\"level_id\":\"2\",\"result\":\"2\"}".getBytes());
             connection.connect();
 
-            InputStream stream = connection.getInputStream();
-            BufferedReader in = new BufferedReader(new InputStreamReader(stream));
-            String inputLine;
-            StringBuffer response = new StringBuffer();
-
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
+            StringBuffer response = getResponse(connection);
 
             Assert.assertEquals("Result added!",response.toString());
 
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -100,21 +91,10 @@ public class AppTest {
             connection.setRequestMethod("GET");
             connection.connect();
 
-            InputStream stream = connection.getInputStream();
-
-            BufferedReader in = new BufferedReader(new InputStreamReader(stream));
-            String inputLine;
-            StringBuffer response = new StringBuffer();
-
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
+            StringBuffer response = getResponse(connection);
 
             Assert.assertEquals("User TOP!user_id 1 = 1",response.toString());
 
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -131,24 +111,27 @@ public class AppTest {
             connection.setRequestMethod("GET");
             connection.connect();
 
-            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            String inputLine;
-            StringBuffer response = new StringBuffer();
-
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
+            StringBuffer response = getResponse(connection);
 
             Assert.assertEquals("Level TOP!level_id 1 = 1",response.toString());
 
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    private StringBuffer getResponse(HttpURLConnection connection) throws IOException {
+        InputStream stream = connection.getInputStream();
+        BufferedReader in = new BufferedReader(new InputStreamReader(stream));
+        String inputLine;
+        StringBuffer response = new StringBuffer();
+
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+        in.close();
+        return response;
+    }
 
     @AfterClass
     public static void stopServer() {

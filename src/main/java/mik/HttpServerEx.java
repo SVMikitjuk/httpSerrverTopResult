@@ -27,7 +27,6 @@ public class HttpServerEx {
             server.createContext("/userinfo", new UserTopHandler());
             server.createContext("/levelinfo", new LevelTopHandler());
             server.createContext("/setinfo", new AddResultHandler());
-            // Set an Executor for the multi-threading
             server.setExecutor(Executors.newCachedThreadPool());
             server.start();
 
